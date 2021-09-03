@@ -15,9 +15,9 @@ public class GradleKarateRunnerPluginTest {
     @Test public void pluginRegistersATask() {
         // Create a test project and apply the plugin
         Project project = ProjectBuilder.builder().build();
-        project.getPlugins().apply("gradle.karate.runner.greeting");
+        project.getPlugins().apply("com.github.prspal.karate-runner");
 
         // Verify the result
-        assertNotNull(project.getTasks().findByName("greeting"));
+        assertNotNull(project.getTasks().findByName("karate"));
     }
 }
