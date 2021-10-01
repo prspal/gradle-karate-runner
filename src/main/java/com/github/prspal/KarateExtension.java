@@ -1,17 +1,19 @@
 package com.github.prspal;
 
+@SuppressWarnings("all")
 public class KarateExtension {
+    public String threads = "";
+    public String name = "";
+    public String help = "";
+    public boolean dryRun = false;
+    public boolean clean = false;
+    public String output = "";
+    public String format = "";
+    public String tags = "";
+    public String configDir = "";
+    public String outputPath = "";
+    public String featurePath = "src/test/resources";
 
-    String threads = "";
-    String name = "";
-    String dryRun = "";
-    String help = "";
-    String clean = "";
-    String configDir = "";
-    String env = "";
-    String[] format =new String[0];
-    String[] tags = new String[0];
-    String featurePath = "src/test/resources";
 
-    String main = "com.intuit.karate.Main";
+    public String main = "com.intuit.karate.Main";
 }

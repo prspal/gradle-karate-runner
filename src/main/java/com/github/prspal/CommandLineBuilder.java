@@ -2,8 +2,10 @@ package com.github.prspal;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 class CommandLineBuilder {
 
@@ -21,11 +23,12 @@ class CommandLineBuilder {
         addThreads(command, extension, commandLineOptions);
         addClean(command, extension, commandLineOptions);
         addFormat(command, extension, commandLineOptions);
-        addConfigDir(command, extension, commandLineOptions, projectDir);
         addTags(command, extension, commandLineOptions);
         addName(command, extension, commandLineOptions);
         addDryRun(command, extension, commandLineOptions);
 
+        addConfigDir(command, extension, commandLineOptions, projectDir);
+        addOutputPath(command, extension, commandLineOptions, projectDir);
         // must be last
         addFeaturePath(command, extension, commandLineOptions, projectDir);
 
@@ -45,129 +48,145 @@ class CommandLineBuilder {
     }
 
     private void addHelp(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if (commandLineOption.help != null) {
-            command.add("--help");
-            return;
-        }
-
-        if (!extension.help.isEmpty()) {
+        if ((commandLineOption.help != null) ||  !extension.help.isEmpty()) {
             command.add("--help");
         }
     }
 
 
     private void addClean(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if (commandLineOption.clean != null) {
-            command.add("--clean");
-            return;
-        }
-
-        if (!extension.clean.isEmpty()) {
+        if ((commandLineOption.clean != null) || extension.clean){
             command.add("--clean");
         }
     }
 
 
     private void addThreads(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if (commandLineOption.threads != null) {
-            command.add("--threads");
-            command.add(commandLineOption.threads);
+        String threads = commandLineOption.threads;
+        if (null == threads && extension.threads.isEmpty()) {
             return;
         }
-
-        if (!extension.threads.isEmpty()) {
-            command.add("--threads");
-            command.add(extension.threads);
+        else{
+            threads = extension.threads;
         }
+
+        command.add("--threads");
+        command.add(threads);
     }
 
 
     private void addTags(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if (commandLineOption.tags != null) {
-            command.add("--tags");
-            command.add("'"+commandLineOption.tags +"'");
+        String tags = commandLineOption.tags;
+        if (null == tags && extension.tags.isEmpty()){
             return;
         }
-
-        if (extension.tags.length > 0) {
-            command.add("--tags");
-            command.add("'"+String.join(",",extension.tags)+"'");
+        else {
+            tags = extension.tags;
         }
+
+        //Group Ignored  & Selected tags separately
+        List<String> ignored = Arrays.stream(tags.split(",")).map(String::trim).filter(trim -> trim.startsWith("~")).collect(Collectors.toList());
+        List<String> selected = Arrays.stream(tags.split(",")).map(String::trim).filter(trim -> !trim.startsWith("~")).collect(Collectors.toList());
+
+        ignored.forEach(tag -> {
+            command.add("--tags");
+            command.add(tag);
+        });
+
+        if(!selected.isEmpty()) {
+            command.add("--tags");
+            command.add(String.join(",", selected));
+        }
+
     }
 
     private void addFormat(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if (commandLineOption.format != null) {
-            command.add("--format=");
-            command.add(commandLineOption.tags);
+        String format = commandLineOption.format;
+        if (null == format && extension.format.isEmpty()){
             return;
         }
-
-        if (extension.format.length > 0) {
-            command.add("--tags=");
-            command.add(String.join(",",extension.format));
+        else if(!extension.format.isEmpty()){
+            format = extension.format;
         }
+
+        command.add("--format=");
+        command.add(format);
     }
 
     private void addName(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if (commandLineOption.name != null) {
-            command.add("--name");
-            command.add(commandLineOption.name);
+        String name = commandLineOption.name;
+        if (null == name && extension.name.isEmpty()){
             return;
         }
-
-        if (!extension.name.isEmpty()) {
-            command.add("--name");
-            command.add(extension.name);
+        else if(!extension.name.isEmpty()){
+            name = extension.name;
         }
+        command.add("--name");
+        command.add(name);
     }
 
     private void addDryRun(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if (commandLineOption.dryRun != null) {
-            command.add("--dry-run");
-            command.add("true");
+        String dryRun = commandLineOption.dryRun;
+        if (null == dryRun && !extension.dryRun){
             return;
         }
-
-        if (!extension.dryRun.isEmpty()) {
-            command.add("--dry-run");
-            command.add("true");
+        else if(extension.dryRun){
+            dryRun = String.valueOf(extension.dryRun);
         }
+        command.add("--dryRun");
+        command.add(String.valueOf(Boolean.parseBoolean(dryRun)));
     }
 
 
     private void addFeaturePath(List<String> command, KarateExtension extension, KarateTask commandLineOption, File projectDir) {
         String featurePath = commandLineOption.featurePath;
-        if (featurePath != null) {
-            boolean absolutePath = new File(featurePath).isAbsolute();
-            if (!absolutePath) {
-                String root = getAbsoluteRoot(projectDir);
-                featurePath = root + featurePath;
-            }
-
-            command.add(featurePath);
-            return;
+        if (null == featurePath ){
+            featurePath = extension.featurePath;
         }
 
-        String root = getAbsoluteRoot(projectDir);
-        featurePath = root + extension.featurePath;
+        boolean absolutePath = new File(featurePath).isAbsolute();
+        if (!absolutePath) {
+            String root = getAbsoluteRoot(projectDir);
+            featurePath = root + featurePath;
+        }
+
         command.add(featurePath);
+    }
+
+    private void addOutputPath(List<String> command, KarateExtension extension, KarateTask commandLineOption, File projectDir) {
+        String outputPath = commandLineOption.outputPath;
+        if (null == outputPath && extension.outputPath.isEmpty()){
+            return;
+        }
+        else {
+            outputPath = extension.outputPath;
+        }
+
+        boolean absolutePath = new File(outputPath).isAbsolute();
+        if (!absolutePath) {
+            String root = getAbsoluteRoot(projectDir);
+            outputPath = root + outputPath;
+        }
+
+        command.add(outputPath);
     }
 
     private void addConfigDir(List<String> command, KarateExtension extension, KarateTask commandLineOption, File projectDir) {
         String configDir = commandLineOption.configDir;
-        if (configDir != null) {
-            boolean absolutePath = new File(configDir).isAbsolute();
-            if (!absolutePath) {
-                String root = getAbsoluteRoot(projectDir);
-                configDir = root + configDir;
-            }
-
-            command.add(configDir);
+        if (null == configDir && extension.configDir.isEmpty()){
             return;
         }
+        else {
+            configDir = extension.configDir;
+        }
 
-        String root = getAbsoluteRoot(projectDir);
-        configDir = root + extension.configDir;
+        boolean absolutePath = new File(configDir).isAbsolute();
+        if (!absolutePath) {
+            String root = getAbsoluteRoot(projectDir);
+            configDir = root + configDir;
+        }
+
+        command.add("--configdir");
         command.add(configDir);
     }
 

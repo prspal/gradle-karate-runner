@@ -3,21 +3,58 @@
  */
 package gradle.karate.runner;
 
-import org.gradle.testfixtures.ProjectBuilder;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.testfixtures.ProjectBuilder;
+import org.gradle.testkit.runner.BuildResult;
+import org.gradle.testkit.runner.GradleRunner;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * A simple unit test for the 'gradle.karate.runner.greeting' plugin.
  */
 public class GradleKarateRunnerPluginTest {
-    @Test public void pluginRegistersATask() {
+    @Test
+    public void pluginRegistersATask() {
+        GradleRunner gradleRunner = GradleRunner.create()
+                .withProjectDir(testProjectDir.getRoot());
+        BuildResult result = gradleRunner
+                .withArguments("karate")
+                .withPluginClasspath()
+                .build();
+
+        System.out.println(result.getTasks());
+
         // Create a test project and apply the plugin
         Project project = ProjectBuilder.builder().build();
         project.getPlugins().apply("com.github.prspal.karate-runner");
 
         // Verify the result
-        assertNotNull(project.getTasks().findByName("karate"));
+        Task karate = project.getTasks().findByName("karate");
+        Assert.assertNotNull(karate);
     }
+
+    @Rule
+    public TemporaryFolder testProjectDir = new TemporaryFolder();
+
+    @Before
+    public void setup() throws IOException {
+        File buildFile;
+        buildFile = testProjectDir.newFile("build.gradle");
+        FileWriter writer = new FileWriter(buildFile);
+        String toWrite = " plugins { id 'com.github.prspal.karate-runner' version '0.0.5' }";
+        writer.write(toWrite);
+        writer.close();
+
+    }
+
 }
+
