@@ -1,0 +1,40 @@
+plugins {
+    id 'com.gradle.plugin-publish' version '0.14.0'
+    id 'java-gradle-plugin'
+}
+
+version = "0.0.6.1"
+group = "com.github.prspal"
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+
+    implementation gradleApi()
+    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+    // Use JUnit test framework for unit tests
+    testImplementation 'junit:junit:4.12'
+}
+
+gradlePlugin {
+    // Define the plugin
+    plugins {
+        greeting {
+            id = 'com.github.prspal.karate-runner'
+            displayName = 'karate'
+            description = 'A Karate-gradle runner'
+            implementationClass = 'com.github.prspal.KarateRunner'
+
+        }
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/prspal/gradle-karate-runner/tree/main/README.md'
+    vcsUrl = 'https://github.com/prspal/gradle-karate-runner'
+    tags = ['karate', 'karate-jvm']
+}
+
