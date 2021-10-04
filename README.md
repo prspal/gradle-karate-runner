@@ -10,7 +10,7 @@ Add the plugin to your project
 
 ```
 plugins {
-  id "com.github.prspal.karate-runner" version "0.0.7.0"
+  id "com.github.prspal.karate-runner" version "0.0.7.3"
 }
 ```
 
@@ -32,6 +32,7 @@ cucumber {
     name = ''
     format = '[html,json,cucumber:json,junit:xml]'
     dryRun = false
+    output = 'relate/absolute path to reports'
     help = ''
 
     featurePath = 'src/test/resources'

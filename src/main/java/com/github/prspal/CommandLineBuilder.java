@@ -109,7 +109,7 @@ class CommandLineBuilder {
             format = extension.format;
         }
 
-        command.add("--format=");
+        command.add("--format");
         command.add(format);
     }
 
@@ -168,6 +168,7 @@ class CommandLineBuilder {
             outputPath = root + outputPath;
         }
 
+        command.add("--output");
         command.add(outputPath);
     }
 
