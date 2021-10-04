@@ -133,7 +133,7 @@ class CommandLineBuilder {
         else if(extension.dryRun){
             dryRun = String.valueOf(extension.dryRun);
         }
-        command.add("--dryRun");
+        command.add("--dryrun");
         command.add(String.valueOf(Boolean.parseBoolean(dryRun)));
     }
 

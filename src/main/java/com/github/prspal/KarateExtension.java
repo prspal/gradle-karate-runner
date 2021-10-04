@@ -7,7 +7,6 @@ public class KarateExtension {
     public String help = "";
     public boolean dryRun = false;
     public boolean clean = false;
-    public String output = "";
     public String format = "";
     public String tags = "";
     public String configDir = "";
