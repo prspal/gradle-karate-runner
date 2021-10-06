@@ -6,11 +6,16 @@ It trades Cucumber-JVM options with Karate-JVM command line implementation and f
 
 ## Usage
 
-Add the plugin to your project
+Add the plugin as well as dependencies for your project
+
 
 ```
 plugins {
-  id "com.github.prspal.karate-runner" version "0.0.7.3"
+  id "com.github.prspal.karate-runner" version "0.0.7.4"
+}
+dependencies {
+    //Add karate gradle dependency
+    implementation 'com.intuit.karate:karate-core:1.1.0'
 }
 ```
 

@@ -11,6 +11,7 @@ public class KarateExtension {
     public String tags = "";
     public String configDir = "";
     public String outputPath = "";
+    public String workdir = "";
     public String featurePath = "src/test/resources";
 
 

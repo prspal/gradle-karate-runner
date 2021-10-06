@@ -2,7 +2,9 @@ package com.github.prspal;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.logging.Logger;
-import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
 
@@ -81,6 +83,13 @@ public class KarateTask extends DefaultTask{
         this.outputPath = outputPath;
     }
 
+    @Option(option = "workdir",
+            description = "The directory where logs and reports are output. Defaults to 'target'")
+    public String workdir;
+    public void setWorkdir(String workdir) {
+        this.workdir = workdir;
+    }
+
     public KarateTask() {
         setGroup("Karate");
         setDescription("Execute Karate-JVM from Gradle");
@@ -148,7 +157,15 @@ public class KarateTask extends DefaultTask{
     }
 
     private String getClasspath() {
-        return getProject().getConfigurations().getByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME).getAsPath();
+        SourceSetContainer sourceSets = getProject().getConvention().getPlugin(JavaPluginConvention.class).getSourceSets();
+
+        for (SourceSet sourceSet : sourceSets) {
+            if ("test".equals(sourceSet.getName())) {
+                return sourceSet.getRuntimeClasspath().getAsPath();
+            }
+        }
+
+        throw new RuntimeException("The test classpath was not found");
     }
 }
 

@@ -29,6 +29,7 @@ class CommandLineBuilder {
 
         addConfigDir(command, extension, commandLineOptions, projectDir);
         addOutputPath(command, extension, commandLineOptions, projectDir);
+        addWorkdir(command, extension, commandLineOptions, projectDir);
         // must be last
         addFeaturePath(command, extension, commandLineOptions, projectDir);
 
@@ -189,6 +190,25 @@ class CommandLineBuilder {
 
         command.add("--configdir");
         command.add(configDir);
+    }
+
+    private void addWorkdir(List<String> command, KarateExtension extension, KarateTask commandLineOption, File projectDir) {
+        String workdir = commandLineOption.workdir;
+        if (null == workdir && extension.workdir.isEmpty()){
+            return;
+        }
+        else {
+            workdir = extension.configDir;
+        }
+
+        boolean absolutePath = new File(workdir).isAbsolute();
+        if (!absolutePath) {
+            String root = getAbsoluteRoot(projectDir);
+            workdir = root + workdir;
+        }
+
+        command.add("--workdir");
+        command.add(workdir);
     }
 
     private String getAbsoluteRoot(File projectDir) {
