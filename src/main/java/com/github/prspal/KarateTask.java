@@ -12,6 +12,14 @@ import java.io.File;
 
 public class KarateTask extends DefaultTask{
 
+    @Option(option = "shorten",
+            description = "Shorten the command line using @argFile (Java 9+)")
+    boolean shorten;
+
+    public void setShorten(boolean shorten) {
+        this.shorten = shorten;
+    }
+
     @Option(option = "karate-help",
             description = "Get Karate help")
     String help;

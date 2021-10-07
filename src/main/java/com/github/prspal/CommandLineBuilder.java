@@ -1,6 +1,9 @@
 package com.github.prspal;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,8 +18,8 @@ class CommandLineBuilder {
         List<String> command = new ArrayList<>();
         command.add("java");
         addSystemProperties(command);
-        command.add("-cp");
-        command.add(classpath);
+        addClasspath(command, classpath, extension, commandLineOptions);
+
         command.add(main);
 
         addHelp(command, extension, commandLineOptions);
@@ -34,6 +37,29 @@ class CommandLineBuilder {
         addFeaturePath(command, extension, commandLineOptions, projectDir);
 
         return command.toArray(new String[0]);
+    }
+
+    private void addClasspath(List<String> command, String classpath, KarateExtension extension, KarateTask commandLineOption) {
+        boolean doShorten;
+        if (commandLineOption.shorten) {
+            doShorten = true;
+        } else {
+            doShorten = extension.shorten;
+        }
+        if (doShorten) {
+            String argFile = Paths.get(commandLineOption.getTemporaryDir().getAbsolutePath(),"cucumber_runner_argFile").toString();
+            try (PrintWriter writer = new PrintWriter(argFile) ){
+                writer.println("-classpath\n" + classpath);
+                command.add("@" + argFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(
+                        String.format("Cannot write temporary file on %s,\nexception message:\n %s", argFile, e.getMessage()));
+            }
+        } else {
+            command.add("-cp");
+            command.add(classpath);
+        }
     }
 
     private void addSystemProperties(List<String> command) {
@@ -64,11 +90,11 @@ class CommandLineBuilder {
 
     private void addThreads(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
         String threads = commandLineOption.threads;
-        if (null == threads && extension.threads.isEmpty()) {
+        if (null == threads && extension.threads < 1 ) {
             return;
         }
         else{
-            threads = extension.threads;
+            threads = String.valueOf(extension.threads);
         }
 
         command.add("--threads");
@@ -81,7 +107,7 @@ class CommandLineBuilder {
         if (null == tags && extension.tags.isEmpty()){
             return;
         }
-        else {
+        else if (!extension.tags.isEmpty()){
             tags = extension.tags;
         }
 

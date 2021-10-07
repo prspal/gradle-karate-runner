@@ -2,11 +2,12 @@ package com.github.prspal;
 
 @SuppressWarnings("all")
 public class KarateExtension {
-    public String threads = "";
+    public int threads = 0;
     public String name = "";
     public String help = "";
     public boolean dryRun = false;
     public boolean clean = false;
+    public boolean shorten = false ;
     public String format = "";
     public String tags = "";
     public String configDir = "";

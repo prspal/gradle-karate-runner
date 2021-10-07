@@ -11,7 +11,7 @@ Add the plugin as well as dependencies for your project
 
 ```
 plugins {
-  id "com.github.prspal.karate-runner" version "0.0.7.4"
+  id "com.github.prspal.karate-runner" version "0.0.7.5"
 }
 dependencies {
     //Add karate gradle dependency
