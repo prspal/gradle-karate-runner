@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-version = "0.0.7.5"
+version = "0.0.7.9"
 group = "com.github.prspal"
 
 repositories {

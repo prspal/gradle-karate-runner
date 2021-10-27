@@ -103,21 +103,17 @@ public class KarateTask extends DefaultTask{
         setDescription("Execute Karate-JVM from Gradle");
     }
     @TaskAction
-    public void runKarate() {
+    public void runKarate() throws Exception {
         KarateExtension extension = getProject().getExtensions().findByType(KarateExtension.class);
         if (extension == null) {
             extension = new KarateExtension();
         }
 
-        try {
-            CommandLineBuilder cliBuilder = new CommandLineBuilder();
-            File projectDir = getProject().getProjectDir();
-            String[] command = cliBuilder.buildCommand(extension, getClasspath(), this, projectDir);
-            debugCommand(command);
-            execute(command);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        CommandLineBuilder cliBuilder = new CommandLineBuilder();
+        File projectDir = getProject().getProjectDir();
+        String[] command = cliBuilder.buildCommand(extension, getClasspath(), this, projectDir);
+        debugCommand(command);
+        execute(command);
     }
 
     private void debugCommand(String[] command) {
@@ -137,27 +133,22 @@ public class KarateTask extends DefaultTask{
 
     }
 
-    private void execute(String[] command) {
+    private void execute(String[] command) throws Exception {
         int exitValue;
 
-        try {
-            Process process = new ProcessBuilder()
-                    .command(command)
-                    .start();
+        ProcessBuilder pb = new ProcessBuilder().command(command);
+        Process process = pb.start();
 
-            StreamConsumer stdOut = new StreamConsumer(process.getInputStream(), System.out);
-            new Thread(stdOut).start();
+        StreamConsumer stdOut = new StreamConsumer(process.getInputStream(), System.out);
+        new Thread(stdOut).start();
 
-            StreamConsumer stdErr = new StreamConsumer(process.getErrorStream(), System.err);
-            new Thread(stdErr).start();
+        StreamConsumer stdErr = new StreamConsumer(process.getErrorStream(), System.err);
+        new Thread(stdErr).start();
 
-            exitValue = process.waitFor();
+        exitValue = process.waitFor();
 
-            stdOut.stopProcessing();
-            stdErr.stopProcessing();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        stdOut.stopProcessing();
+        stdErr.stopProcessing();
 
         if (exitValue != 0) {
             throw new RuntimeException("The execution failed");

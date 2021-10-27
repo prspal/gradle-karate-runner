@@ -70,7 +70,9 @@ class CommandLineBuilder {
             String value = props.getProperty(keyValue);
 
             String systemProperty = "-D" + keyValue + "=" + value;
-            command.add(systemProperty);
+            if(!keyValue.equals("java.class.path")){
+                command.add(systemProperty);
+            }
         }
     }
 
