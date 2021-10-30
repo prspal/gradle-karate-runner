@@ -4,7 +4,7 @@ package com.github.prspal;
 public class KarateExtension {
     public int threads = 0;
     public String name = "";
-    public String help = "";
+    public boolean help = false;
     public boolean dryRun = false;
     public boolean clean = false;
     public boolean shorten = false ;

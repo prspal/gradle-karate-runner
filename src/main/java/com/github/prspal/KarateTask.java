@@ -22,15 +22,15 @@ public class KarateTask extends DefaultTask{
 
     @Option(option = "karate-help",
             description = "Get Karate help")
-    String help;
-    public void setHelp(String help) {
+    boolean help;
+    public void setHelp(boolean help) {
         this.help = help;
     }
 
     @Option(option = "karate-clean",
             description = "Clean Karate target directory")
-    String clean;
-    public void setClean(String clean) {
+    boolean clean;
+    public void setClean(boolean clean) {
         this.clean = clean;
     }
 
@@ -65,8 +65,8 @@ public class KarateTask extends DefaultTask{
 
     @Option(option = "karate-dry-run",
             description = "Skip execution of glue code.")
-    String dryRun;
-    public void setDryRun(String dryRun) {
+    boolean dryRun;
+    public void setDryRun(boolean dryRun) {
         this.dryRun = dryRun;
     }
 

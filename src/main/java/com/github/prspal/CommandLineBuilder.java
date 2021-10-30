@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 class CommandLineBuilder {
 
@@ -47,8 +45,8 @@ class CommandLineBuilder {
             doShorten = extension.shorten;
         }
         if (doShorten) {
-            String argFile = Paths.get(commandLineOption.getTemporaryDir().getAbsolutePath(),"cucumber_runner_argFile").toString();
-            try (PrintWriter writer = new PrintWriter(argFile) ){
+            String argFile = Paths.get(commandLineOption.getTemporaryDir().getAbsolutePath(), "cucumber_runner_argFile").toString();
+            try (PrintWriter writer = new PrintWriter(argFile)) {
                 writer.println("-classpath\n" + classpath);
                 command.add("@" + argFile);
             } catch (IOException e) {
@@ -70,21 +68,21 @@ class CommandLineBuilder {
             String value = props.getProperty(keyValue);
 
             String systemProperty = "-D" + keyValue + "=" + value;
-            if(!keyValue.equals("java.class.path")){
+            if (!keyValue.equals("java.class.path")) {
                 command.add(systemProperty);
             }
         }
     }
 
     private void addHelp(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if ((commandLineOption.help != null) ||  !extension.help.isEmpty()) {
+        if (commandLineOption.help || extension.help) {
             command.add("--help");
         }
     }
 
 
     private void addClean(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        if ((commandLineOption.clean != null) || extension.clean){
+        if (commandLineOption.clean || extension.clean) {
             command.add("--clean");
         }
     }
@@ -92,10 +90,9 @@ class CommandLineBuilder {
 
     private void addThreads(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
         String threads = commandLineOption.threads;
-        if (null == threads && extension.threads < 1 ) {
+        if (null == threads && extension.threads < 1) {
             return;
-        }
-        else{
+        } else {
             threads = String.valueOf(extension.threads);
         }
 
@@ -106,35 +103,22 @@ class CommandLineBuilder {
 
     private void addTags(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
         String tags = commandLineOption.tags;
-        if (null == tags && extension.tags.isEmpty()){
+        if (null == tags && extension.tags.isEmpty()) {
             return;
-        }
-        else if (!extension.tags.isEmpty()){
+        } else if (!extension.tags.isEmpty()) {
             tags = extension.tags;
         }
 
-        //Group Ignored  & Selected tags separately
-        List<String> ignored = Arrays.stream(tags.split(",")).map(String::trim).filter(trim -> trim.startsWith("~")).collect(Collectors.toList());
-        List<String> selected = Arrays.stream(tags.split(",")).map(String::trim).filter(trim -> !trim.startsWith("~")).collect(Collectors.toList());
-
-        ignored.forEach(tag -> {
-            command.add("--tags");
-            command.add(tag);
-        });
-
-        if(!selected.isEmpty()) {
-            command.add("--tags");
-            command.add(String.join(",", selected));
-        }
+        command.add("--tags");
+        command.add("\""+tags+"\"");
 
     }
 
     private void addFormat(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
         String format = commandLineOption.format;
-        if (null == format && extension.format.isEmpty()){
+        if (null == format && extension.format.isEmpty()) {
             return;
-        }
-        else if(!extension.format.isEmpty()){
+        } else if (!extension.format.isEmpty()) {
             format = extension.format;
         }
 
@@ -144,10 +128,9 @@ class CommandLineBuilder {
 
     private void addName(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
         String name = commandLineOption.name;
-        if (null == name && extension.name.isEmpty()){
+        if (null == name && extension.name.isEmpty()) {
             return;
-        }
-        else if(!extension.name.isEmpty()){
+        } else if (!extension.name.isEmpty()) {
             name = extension.name;
         }
         command.add("--name");
@@ -155,21 +138,17 @@ class CommandLineBuilder {
     }
 
     private void addDryRun(List<String> command, KarateExtension extension, KarateTask commandLineOption) {
-        String dryRun = commandLineOption.dryRun;
-        if (null == dryRun && !extension.dryRun){
-            return;
+        if (commandLineOption.dryRun || extension.dryRun) {
+            command.add("--dryrun");
+            command.add("true");
         }
-        else if(extension.dryRun){
-            dryRun = String.valueOf(extension.dryRun);
-        }
-        command.add("--dryrun");
-        command.add(String.valueOf(Boolean.parseBoolean(dryRun)));
+
     }
 
 
     private void addFeaturePath(List<String> command, KarateExtension extension, KarateTask commandLineOption, File projectDir) {
         String featurePath = commandLineOption.featurePath;
-        if (null == featurePath ){
+        if (null == featurePath) {
             featurePath = extension.featurePath;
         }
 
@@ -184,10 +163,9 @@ class CommandLineBuilder {
 
     private void addOutputPath(List<String> command, KarateExtension extension, KarateTask commandLineOption, File projectDir) {
         String outputPath = commandLineOption.outputPath;
-        if (null == outputPath && extension.outputPath.isEmpty()){
+        if (null == outputPath && extension.outputPath.isEmpty()) {
             return;
-        }
-        else {
+        } else {
             outputPath = extension.outputPath;
         }
 
@@ -203,10 +181,9 @@ class CommandLineBuilder {
 
     private void addConfigDir(List<String> command, KarateExtension extension, KarateTask commandLineOption, File projectDir) {
         String configDir = commandLineOption.configDir;
-        if (null == configDir && extension.configDir.isEmpty()){
+        if (null == configDir && extension.configDir.isEmpty()) {
             return;
-        }
-        else {
+        } else {
             configDir = extension.configDir;
         }
 
@@ -222,10 +199,9 @@ class CommandLineBuilder {
 
     private void addWorkdir(List<String> command, KarateExtension extension, KarateTask commandLineOption, File projectDir) {
         String workdir = commandLineOption.workdir;
-        if (null == workdir && extension.workdir.isEmpty()){
+        if (null == workdir && extension.workdir.isEmpty()) {
             return;
-        }
-        else {
+        } else {
             workdir = extension.configDir;
         }
 
