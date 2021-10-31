@@ -110,7 +110,7 @@ class CommandLineBuilder {
         }
 
         command.add("--tags");
-        command.add("\""+tags+"\"");
+        command.add(tags);
 
     }
 
